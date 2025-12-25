@@ -1,0 +1,48 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environments
+.env
+.env.local
+.env.*.local
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases
+*.db
+*.sqlite3
+
+# Node modules
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Android
+.gradle/
+local.properties
+.navigation/
+capture/
+*.apk
+*.aar
+*.jks
+*.keystore
+google-services.json
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+.DS_Store
+
+# Misc
+.agent/
+brain/
+*.log
