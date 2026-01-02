@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Shield,
     Mail,
@@ -11,12 +11,21 @@ import {
     Zap,
     Eye,
     Smartphone,
-    Loader2
+    Loader2,
+    Play
 } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../App';
 
 function LandingPage() {
+    const { toggleDemoMode } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+
+    const handleDemoMode = () => {
+        toggleDemoMode(true);
+        navigate('/dashboard');
+    };
 
     const handleLogin = async () => {
         setLoading(true);
@@ -33,7 +42,10 @@ function LandingPage() {
         } catch (error) {
             console.error('Login error:', error);
             const errorMessage = error.response?.data?.detail || error.message || 'Unknown error occurred';
-            alert(`Login Failed: ${errorMessage}\n\nCheck console for details.`);
+
+            if (window.confirm(`Login Failed: ${errorMessage}\n\nWould you like to explore the platform in Demo Mode instead?`)) {
+                handleDemoMode();
+            }
             setLoading(false);
         }
     };
@@ -96,6 +108,10 @@ function LandingPage() {
                             <Link to="/developers" className="text-slate-400 hover:text-white transition-colors hidden sm:block">
                                 Developers
                             </Link>
+                            <button onClick={handleDemoMode} className="btn-secondary hidden md:flex items-center gap-2">
+                                <Play className="w-4 h-4" />
+                                <span>Demo Mode</span>
+                            </button>
                             <button onClick={handleLogin} disabled={loading} className="btn-primary flex items-center gap-2 disabled:opacity-50">
                                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
                                 <span>{loading ? 'Connecting...' : 'Get Started'}</span>
@@ -135,10 +151,10 @@ function LandingPage() {
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mail className="w-5 h-5" />}
                             {loading ? 'Connecting...' : 'Connect Gmail'}
                         </button>
-                        <Link to="/developers" className="btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2">
-                            <Eye className="w-5 h-5" />
-                            About Developers
-                        </Link>
+                        <button onClick={handleDemoMode} className="btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2">
+                            <Play className="w-5 h-5" />
+                            Explore Demo
+                        </button>
                     </div>
 
                     {/* Trust badges */}

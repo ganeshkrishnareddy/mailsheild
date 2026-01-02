@@ -18,7 +18,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Link } from 'react-router-dom';
 
 function Dashboard() {
-    const { user, fetchUser } = useAuth();
+    const { user, fetchUser, isDemoMode } = useAuth();
     const [loading, setLoading] = useState(false);
     const [scanning, setScanning] = useState(false);
     const [scanResults, setScanResults] = useState(null);
@@ -26,9 +26,32 @@ function Dashboard() {
     const [recentUrlScans, setRecentUrlScans] = useState([]);
 
     useEffect(() => {
-        loadRecentEmails();
-        loadRecentUrlScans();
-    }, []);
+        if (isDemoMode) {
+            generateMockData();
+        } else {
+            loadRecentEmails();
+            loadRecentUrlScans();
+        }
+    }, [isDemoMode]);
+
+    const generateMockData = () => {
+        const mockEmails = [
+            { sender: 'security@paypa1.co', subject: 'Urgent: Account Verification Required', risk_level: 'high', timestamp: new Date().toISOString() },
+            { sender: 'hr@amazon-office.net', subject: 'Your tax documents are ready', risk_level: 'high', timestamp: new Date().toISOString() },
+            { sender: 'it-support@microsoft.com.co', subject: 'Critical Security Patch for Windows', risk_level: 'medium', timestamp: new Date().toISOString() },
+            { sender: 'newsletter@github.com', subject: 'Your weekly code summary', risk_level: 'safe', timestamp: new Date().toISOString() },
+            { sender: 'shipping@fedex-tracking.biz', subject: 'Package delivery failed - Action needed', risk_level: 'medium', timestamp: new Date().toISOString() }
+        ];
+
+        const mockUrls = [
+            { url: 'https://login-verification-secure.com/auth', risk_level: 'high' },
+            { url: 'https://github.com/ganeshkrishnareddy', risk_level: 'low' },
+            { url: 'http://amazon-prime-gift.xyz/claim', risk_level: 'high' }
+        ];
+
+        setRecentEmails(mockEmails);
+        setRecentUrlScans(mockUrls);
+    };
 
     const loadRecentEmails = async () => {
         try {
@@ -51,6 +74,19 @@ function Dashboard() {
     const handleScan = async () => {
         setScanning(true);
         setScanResults(null);
+
+        if (isDemoMode) {
+            // Simulate a realistic scan delay
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            setScanResults({
+                total_scanned: 48,
+                phishing_found: 3,
+                suspicious_found: 1
+            });
+            setScanning(false);
+            return;
+        }
+
         try {
             const response = await api.post('/api/emails/scan', {
                 max_emails: 50,
@@ -129,13 +165,21 @@ function Dashboard() {
             {/* Optimized Header for Mobile */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-tight">
-                        Dashboard
-                    </h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-tight">
+                            Dashboard
+                        </h1>
+                        {isDemoMode && (
+                            <div className="px-2 py-1 rounded-md bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                                Demo Mode
+                            </div>
+                        )}
+                    </div>
                     <p className="text-slate-400 text-sm mt-1">
-                        {user?.last_scan_at
+                        {isDemoMode ? 'Simulating real-time AI phishing analysis' : (user?.last_scan_at
                             ? `Last scan: ${new Date(user.last_scan_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                            : 'Start protecting your inbox'}
+                            : 'Start protecting your inbox')}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
