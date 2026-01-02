@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Developers from './pages/Developers';
+import About from './pages/About';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 import Dashboard from './pages/Dashboard';
 import EmailInsights from './pages/EmailInsights';
 import Settings from './pages/Settings';
@@ -92,6 +95,9 @@ function App() {
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/developers" element={<Developers />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<Terms />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
 
                     {/* Protected Routes */}

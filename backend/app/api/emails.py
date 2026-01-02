@@ -12,13 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.database import get_db
-from app.models import User, ScanHistory
+from app.models import User, ScanHistory, UrlScanHistory
 from app.schemas import (
     EmailSummary,
     ScanRequest,
     ScanResponse,
     DashboardStats,
-    EmailAnalysisResult
+    EmailAnalysisResult,
+    UrlScanResponse
 )
 from app.api.auth import get_user_from_token, get_user_credentials
 from app.services import GmailService, AlertMessage, telegram_service
@@ -171,7 +172,24 @@ async def get_dashboard(
     recent_scans = result.scalars().all()
     
     # We don't have email details stored (privacy), so just show counts
-    recent_threats = []
+    # Get recent URL scans
+    url_result = await db.execute(
+        select(UrlScanHistory)
+        .where(UrlScanHistory.user_id == user.id)
+        .order_by(UrlScanHistory.scanned_at.desc())
+        .limit(5)
+    )
+    url_scans = url_result.scalars().all()
+    
+    recent_url_scans = [
+        UrlScanResponse(
+            url=h.url,
+            risk_level=h.risk_level,
+            risk_score=h.risk_score,
+            reasons=h.detection_reasons.get('types', []) if h.detection_reasons else [],
+            is_safe=(h.risk_level == "safe")
+        ) for h in url_scans
+    ]
     
     return DashboardStats(
         total_emails_scanned=user.emails_scanned,
@@ -184,7 +202,8 @@ async def get_dashboard(
             "medium": user.suspicious_detected,
             "safe": user.emails_scanned - user.phishing_detected - user.suspicious_detected
         },
-        recent_threats=recent_threats
+        recent_threats=recent_threats,
+        recent_url_scans=recent_url_scans
     )
 
 

@@ -1,5 +1,9 @@
 # 🛡️ MailShield - Phishing Awareness Platform
 
+<p align="center">
+  <img src="logo.png" width="400" alt="MailShield Logo">
+</p>
+
 [![MailShield](https://img.shields.io/badge/MailShield-v1.1.0-blue?style=for-the-badge&logo=android)](https://img.shields.io/badge/MailShield-v1.1.0-blue)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](https://img.shields.io/badge/License-MIT-green)
 

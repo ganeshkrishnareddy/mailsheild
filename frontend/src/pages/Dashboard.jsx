@@ -9,9 +9,13 @@ import {
     TrendingUp,
     RefreshCw,
     Clock,
-    Zap
+    Zap,
+    ChevronRight,
+    Settings as SettingsIcon,
+    Bell
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
     const { user, fetchUser } = useAuth();
@@ -19,17 +23,28 @@ function Dashboard() {
     const [scanning, setScanning] = useState(false);
     const [scanResults, setScanResults] = useState(null);
     const [recentEmails, setRecentEmails] = useState([]);
+    const [recentUrlScans, setRecentUrlScans] = useState([]);
 
     useEffect(() => {
         loadRecentEmails();
+        loadRecentUrlScans();
     }, []);
 
     const loadRecentEmails = async () => {
         try {
-            const response = await api.get('/api/emails/recent?limit=10');
+            const response = await api.get('/api/emails/recent?limit=5');
             setRecentEmails(response.data);
         } catch (error) {
             console.error('Failed to load emails:', error);
+        }
+    };
+
+    const loadRecentUrlScans = async () => {
+        try {
+            const response = await api.get('/api/threats/recent-urls');
+            setRecentUrlScans(response.data);
+        } catch (error) {
+            console.error('Failed to load URL scans:', error);
         }
     };
 
@@ -54,19 +69,19 @@ function Dashboard() {
 
     const stats = [
         {
-            label: 'Emails Scanned',
+            label: 'Total Scanned',
             value: user?.emails_scanned || 0,
             icon: Mail,
             color: 'blue',
-            bgColor: 'bg-blue-500/20',
+            bgColor: 'bg-blue-500/10',
             textColor: 'text-blue-400'
         },
         {
-            label: 'Phishing Blocked',
+            label: 'Phishing Found',
             value: user?.phishing_detected || 0,
             icon: AlertTriangle,
             color: 'red',
-            bgColor: 'bg-red-500/20',
+            bgColor: 'bg-red-500/10',
             textColor: 'text-red-400'
         },
         {
@@ -74,20 +89,19 @@ function Dashboard() {
             value: user?.suspicious_detected || 0,
             icon: Shield,
             color: 'yellow',
-            bgColor: 'bg-yellow-500/20',
+            bgColor: 'bg-yellow-500/10',
             textColor: 'text-yellow-400'
         },
         {
-            label: 'Safe Emails',
+            label: 'Protected',
             value: (user?.emails_scanned || 0) - (user?.phishing_detected || 0) - (user?.suspicious_detected || 0),
             icon: CheckCircle,
             color: 'green',
-            bgColor: 'bg-green-500/20',
+            bgColor: 'bg-green-500/10',
             textColor: 'text-green-400'
         }
     ];
 
-    // Pie chart data
     const pieData = [
         { name: 'Phishing', value: user?.phishing_detected || 0, color: '#ef4444' },
         { name: 'Suspicious', value: user?.suspicious_detected || 0, color: '#f59e0b' },
@@ -96,99 +110,148 @@ function Dashboard() {
 
     const getRiskBadge = (level) => {
         const badges = {
-            high: { class: 'risk-high', label: '🚨 High Risk' },
-            medium: { class: 'risk-medium', label: '⚠️ Suspicious' },
-            low: { class: 'risk-low', label: 'ℹ️ Low Risk' },
-            safe: { class: 'risk-safe', label: '✅ Safe' }
+            high: 'badge-high',
+            medium: 'badge-medium',
+            low: 'badge-low',
+            safe: 'badge-safe'
         };
-        const badge = badges[level] || badges.safe;
-        return <span className={`px-3 py-1 rounded-full text-xs font-medium ${badge.class}`}>{badge.label}</span>;
+        const labels = {
+            high: 'PHISHING',
+            medium: 'SUSPICIOUS',
+            low: 'MODERATE',
+            safe: 'SAFE'
+        };
+        return <span className={`badge-risk ${badges[level] || badges.safe}`}>{labels[level] || labels.safe}</span>;
     };
 
     return (
-        <div className="space-y-6 fade-in">
-            {/* Welcome Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="space-y-8 fade-in">
+            {/* Optimized Header for Mobile */}
+            <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-white">
-                        Welcome back, {user?.name?.split(' ')[0] || 'User'}! 👋
+                    <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-tight">
+                        Dashboard
                     </h1>
-                    <p className="text-slate-400 mt-1">
+                    <p className="text-slate-400 text-sm mt-1">
                         {user?.last_scan_at
-                            ? `Last scan: ${new Date(user.last_scan_at.endsWith('Z') ? user.last_scan_at : user.last_scan_at + 'Z').toLocaleString()}`
-                            : 'Start your first scan to protect your inbox'}
+                            ? `Last scan: ${new Date(user.last_scan_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                            : 'Start protecting your inbox'}
                     </p>
                 </div>
-                <button
-                    onClick={handleScan}
-                    disabled={scanning}
-                    className="btn-primary flex items-center gap-2 disabled:opacity-50"
-                >
-                    {scanning ? (
-                        <>
-                            <RefreshCw className="w-5 h-5 animate-spin" />
-                            Scanning...
-                        </>
-                    ) : (
-                        <>
-                            <Zap className="w-5 h-5" />
-                            Scan Now
-                        </>
-                    )}
-                </button>
+                <div className="flex items-center gap-3">
+                    <Link to="/settings" className="w-11 h-11 flex items-center justify-center rounded-2xl glass-interactive text-slate-400 hover:text-white">
+                        <SettingsIcon className="w-5 h-5" />
+                    </Link>
+                    <div className="hidden lg:flex items-center gap-3 bg-slate-800/50 p-1.5 rounded-2xl border border-white/5">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                            {user?.name?.charAt(0) || 'U'}
+                        </div>
+                        <span className="text-sm font-medium mr-2">{user?.name?.split(' ')[0]}</span>
+                    </div>
+                </div>
             </div>
 
-            {/* Scan Results Alert */}
+            {/* Premium Call-to-Action */}
+            <div className="glass-card p-6 lg:p-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl -mr-16 -mt-16 group-hover:bg-blue-500/20 transition-all duration-700"></div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">Ready for a scan?</h2>
+                        <p className="text-slate-400 text-sm lg:text-base max-w-sm">
+                            We'll check your recent emails for phishing attempts and malicious links.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleScan}
+                        disabled={scanning}
+                        className="btn-primary w-full md:w-auto min-w-[160px] relative overflow-hidden group/btn"
+                    >
+                        {scanning ? (
+                            <>
+                                <RefreshCw className="w-5 h-5 animate-spin" />
+                                <span>Scanning Inbox...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Zap className="w-5 h-5 text-yellow-400 group-hover/btn:scale-125 transition-transform" />
+                                <span>Analyze Recent Emails</span>
+                            </>
+                        )}
+                        {scanning && <div className="absolute bottom-0 left-0 h-1 bg-white/30 animate-[scan_2s_linear_infinite]" style={{ width: '100%' }}></div>}
+                    </button>
+                </div>
+            </div>
+
+            {/* Scan Results - Compact & Impactful */}
             {scanResults && (
-                <div className="glass-card p-6 border-l-4 border-blue-500 fade-in">
-                    <h3 className="text-lg font-semibold text-white mb-2">Scan Complete!</h3>
-                    <div className="flex flex-wrap gap-6 text-sm">
-                        <div><span className="text-slate-400">Scanned:</span> <span className="text-white font-medium">{scanResults.total_scanned}</span></div>
-                        <div><span className="text-slate-400">Phishing:</span> <span className="text-red-400 font-medium">{scanResults.phishing_found}</span></div>
-                        <div><span className="text-slate-400">Suspicious:</span> <span className="text-yellow-400 font-medium">{scanResults.suspicious_found}</span></div>
-                        <div><span className="text-slate-400">Safe:</span> <span className="text-green-400 font-medium">{scanResults.safe_found}</span></div>
+                <div className="glass-card bg-blue-500/5 border-blue-500/20 p-5 flex items-center justify-between animate-pulse">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                            <CheckCircle className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-white font-bold">Scan Complete</p>
+                            <p className="text-slate-400 text-xs">Analyzed {scanResults.total_scanned} emails</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-4">
+                        <div className="text-center">
+                            <div className="text-red-400 font-bold leading-none">{scanResults.phishing_found}</div>
+                            <div className="text-[10px] text-slate-500 font-bold uppercase mt-1">Phishing</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-yellow-400 font-bold leading-none">{scanResults.suspicious_found}</div>
+                            <div className="text-[10px] text-slate-500 font-bold uppercase mt-1">Suspicious</div>
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Stats Grid - Better Mobile Responsiveness */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-1 lg:px-0">
                 {stats.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
-                        <div key={index} className="stat-card">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={`w-12 h-12 rounded-xl ${stat.bgColor} flex items-center justify-center`}>
-                                    <Icon className={`w-6 h-6 ${stat.textColor}`} />
+                        <div key={index} className="stat-card group hover:scale-[1.02] transition-transform duration-300">
+                            <div className="flex items-center justify-between w-full">
+                                <div className={`stat-icon ${stat.bgColor} ${stat.textColor}`}>
+                                    <Icon className="w-5 h-5 lg:w-6 lg:h-6" />
                                 </div>
-                                <TrendingUp className="w-5 h-5 text-slate-600" />
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <TrendingUp className="w-4 h-4 text-slate-500" />
+                                </div>
                             </div>
-                            <div className={`text-3xl font-bold ${stat.textColor} mb-1`}>
-                                {stat.value.toLocaleString()}
+                            <div className="mt-2">
+                                <div className={`text-2xl lg:text-3xl font-bold ${stat.textColor} tracking-tight`}>
+                                    {stat.value.toLocaleString()}
+                                </div>
+                                <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider mt-1">{stat.label}</div>
                             </div>
-                            <div className="text-slate-400 text-sm">{stat.label}</div>
                         </div>
                     );
                 })}
             </div>
 
-            {/* Charts and Recent Activity */}
-            <div className="grid lg:grid-cols-3 gap-6">
-                {/* Pie Chart */}
-                <div className="glass-card p-6">
-                    <h3 className="text-lg font-semibold text-white mb-4">Risk Distribution</h3>
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Risk Distribution - Enhanced visual hierarchy */}
+                <div className="glass-card p-6 flex flex-col">
+                    <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                        Threat Distribution
+                        <Shield className="w-4 h-4 text-blue-400" />
+                    </h3>
                     {pieData.length > 0 ? (
-                        <div className="h-48">
+                        <div className="flex-1 min-h-[200px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={pieData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={40}
-                                        outerRadius={80}
-                                        paddingAngle={5}
+                                        innerRadius={60}
+                                        outerRadius={90}
+                                        paddingAngle={8}
                                         dataKey="value"
+                                        stroke="none"
                                     >
                                         {pieData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
@@ -196,127 +259,120 @@ function Dashboard() {
                                     </Pie>
                                     <Tooltip
                                         contentStyle={{
-                                            background: '#1e293b',
-                                            border: '1px solid #334155',
-                                            borderRadius: '8px'
+                                            background: '#0f172a',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '12px',
+                                            padding: '12px'
                                         }}
+                                        itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
                     ) : (
-                        <div className="h-48 flex items-center justify-center text-slate-500">
-                            No scan data yet
+                        <div className="flex-1 flex flex-col items-center justify-center text-slate-500 py-12">
+                            <Shield className="w-12 h-12 opacity-10 mb-4" />
+                            <p className="text-sm">Scan to see distribution</p>
                         </div>
                     )}
-                    <div className="flex justify-center gap-4 mt-4">
+                    <div className="grid grid-cols-3 gap-2 mt-6">
                         {pieData.map((item, index) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                                <span className="text-slate-400 text-sm">{item.name}</span>
+                            <div key={index} className="flex flex-col items-center p-2 rounded-xl bg-white/5 border border-white/5">
+                                <div className="w-2 h-2 rounded-full mb-1" style={{ backgroundColor: item.color }}></div>
+                                <span className="text-[10px] text-slate-500 font-bold uppercase">{item.name}</span>
+                                <span className="text-sm font-bold text-white leading-none mt-1">{item.value}</span>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Recent Emails */}
+                {/* Recent Activity - Premium List Design */}
                 <div className="lg:col-span-2 glass-card p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-white">Recent Emails</h3>
-                        <button
-                            onClick={loadRecentEmails}
-                            className="text-slate-400 hover:text-white transition-colors"
-                        >
-                            <RefreshCw className="w-5 h-5" />
-                        </button>
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-bold text-white">Recent Email Threats</h3>
+                        <Link to="/emails" className="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group">
+                            Full Insights
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
                     </div>
 
                     {recentEmails.length > 0 ? (
-                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                        <div className="space-y-4">
                             {recentEmails.map((email, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-start gap-4 p-4 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 transition-colors"
+                                    className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex items-center gap-4 group cursor-pointer"
                                 >
-                                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${email.risk_level === 'high' ? 'bg-red-500' :
-                                        email.risk_level === 'medium' ? 'bg-yellow-500' :
-                                            email.risk_level === 'low' ? 'bg-blue-500' : 'bg-green-500'
-                                        }`}></div>
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold group-hover:scale-110 transition-transform ${email.risk_level === 'high' ? 'bg-red-500/20 text-red-400' :
+                                        email.risk_level === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                            'bg-blue-500/20 text-blue-400'
+                                        }`}>
+                                        {email.sender?.charAt(0).toUpperCase()}
+                                    </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="min-w-0">
-                                                <p className="text-white font-medium truncate">{email.sender}</p>
-                                                <p className="text-slate-400 text-sm truncate">{email.subject}</p>
-                                            </div>
+                                        <div className="flex items-start justify-between mb-1">
+                                            <p className="text-white font-bold truncate text-sm lg:text-base">{email.sender}</p>
                                             {getRiskBadge(email.risk_level)}
                                         </div>
-                                        {email.detection_reasons?.length > 0 && (
-                                            <p className="text-slate-500 text-xs mt-2 truncate">
-                                                {email.detection_reasons[0]}
-                                            </p>
-                                        )}
+                                        <p className="text-slate-400 text-xs lg:text-sm truncate pr-4">{email.subject}</p>
                                     </div>
+                                    <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors hidden sm:block" />
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12 text-slate-500">
-                            <Mail className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                            <p>No emails scanned yet</p>
-                            <p className="text-sm">Click "Scan Now" to analyze your inbox</p>
+                        <div className="text-center py-16 text-slate-500">
+                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Mail className="w-8 h-8 opacity-20" />
+                            </div>
+                            <p className="font-bold text-slate-400">No threats detected</p>
+                            <p className="text-xs max-w-[200px] mx-auto mt-2">Recently analyzed emails will appear here if risks are found.</p>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button
-                        onClick={handleScan}
-                        disabled={scanning}
-                        className="p-4 rounded-xl bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 transition-colors text-left"
-                    >
-                        <Zap className="w-6 h-6 text-blue-400 mb-2" />
-                        <span className="text-white font-medium block">Quick Scan</span>
-                        <span className="text-slate-400 text-sm">Scan unread emails</span>
-                    </button>
-
-                    <button
-                        onClick={() => alert("Auto-scanning is enabled by default every 30 minutes! Configure in Settings.")}
-                        className="p-4 rounded-xl bg-purple-600/20 border border-purple-500/30 hover:bg-purple-600/30 transition-colors text-left"
-                    >
-                        <Clock className="w-6 h-6 text-purple-400 mb-2" />
-                        <span className="text-white font-medium block">Schedule Scan</span>
-                        <span className="text-slate-400 text-sm">Manage interval</span>
-                    </button>
-
-                    <button
-                        onClick={() => window.open(`${api.defaults.baseURL}/api/emails/report/pdf`, '_blank')}
-                        className="p-4 rounded-xl bg-green-600/20 border border-green-500/30 hover:bg-green-600/30 transition-colors text-left"
-                    >
-                        <Shield className="w-6 h-6 text-green-400 mb-2" />
-                        <span className="text-white font-medium block">Security Report</span>
-                        <span className="text-slate-400 text-sm">Download PDF</span>
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            if (window.confirm("Export all your data? This will download a JSON file.")) {
-                                window.open(`${api.defaults.baseURL}/api/emails/export`, '_blank');
-                            }
-                        }}
-                        className="p-4 rounded-xl bg-yellow-600/20 border border-yellow-500/30 hover:bg-yellow-600/30 transition-colors text-left"
-                    >
-                        <Mail className="w-6 h-6 text-yellow-400 mb-2" />
-                        <span className="text-white font-medium block">Export Data</span>
-                        <span className="text-slate-400 text-sm">GDPR Download</span>
+            {/* Browser Protection - Dark Mode/Extension Style */}
+            <div className="glass-card p-6 overflow-hidden relative">
+                <div className="absolute bottom-0 right-0 opacity-10 -mr-8 -mb-8">
+                    <Shield className="w-32 h-32 text-blue-400" />
+                </div>
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            Real-time Protection
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        </h3>
+                        <p className="text-slate-400 text-xs">Extension active on 124 websites</p>
+                    </div>
+                    <button onClick={loadRecentUrlScans} className="text-slate-500 hover:text-white transition-all">
+                        <RefreshCw className="w-4 h-4" />
                     </button>
                 </div>
+
+                {recentUrlScans.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {recentUrlScans.slice(0, 3).map((scan, index) => (
+                            <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${scan.risk_level === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                    <Zap className="w-4 h-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-white text-xs font-bold truncate">{scan.url}</p>
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase">{scan.risk_level} risk detected</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="py-4 text-center border-2 border-dashed border-white/5 rounded-2xl">
+                        <p className="text-slate-600 text-xs font-bold uppercase tracking-widest">Extension Data Hub</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 export default Dashboard;
+

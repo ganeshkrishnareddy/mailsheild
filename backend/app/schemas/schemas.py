@@ -103,6 +103,20 @@ class ScanResponse(BaseModel):
     emails: List[EmailSummary]
 
 
+class UrlScanRequest(BaseModel):
+    """Request to scan a URL."""
+    url: str
+
+
+class UrlScanResponse(BaseModel):
+    """Result of a URL scan."""
+    url: str
+    risk_level: str
+    risk_score: int
+    reasons: List[str]
+    is_safe: bool
+
+
 # ===========================================
 # Dashboard Stats Schemas
 # ===========================================
@@ -116,6 +130,7 @@ class DashboardStats(BaseModel):
     last_scan_at: Optional[datetime]
     risk_breakdown: Dict[str, int]
     recent_threats: List[EmailSummary]
+    recent_url_scans: List[UrlScanResponse] = []
 
 
 # ===========================================

@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.api import auth, emails, notifications, settings as settings_router, admin, awareness
+from app.api import auth, emails, notifications, settings as settings_router, admin, awareness, threats
 
 
 @asynccontextmanager
@@ -36,7 +36,12 @@ app = FastAPI(
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL, "http://localhost:3000", "http://localhost:5173"],
+    allow_origins=[
+        settings.FRONTEND_URL, 
+        "http://localhost:3000", 
+        "http://localhost:5173",
+        "https://mail.google.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,6 +55,7 @@ app.include_router(notifications.router, prefix="/api/notifications", tags=["Not
 app.include_router(settings_router.router, prefix="/api/settings", tags=["Settings"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(awareness.router, prefix="/api/awareness", tags=["Awareness"])
+app.include_router(threats.router, prefix="/api/threats", tags=["Threats"])
 
 
 @app.get("/", tags=["Health"])

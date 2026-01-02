@@ -45,6 +45,7 @@ class GmailService:
     LABEL_PHISHING = "🚨 Phishing Alert"
     LABEL_SUSPICIOUS = "⚠ Suspicious"
     LABEL_SAFE = "✅ Verified Safe"
+    LABEL_QUARANTINE = "[MailShield Quarantined]"
     
     def __init__(self, credentials: Credentials):
         """Initialize Gmail service with OAuth credentials."""
@@ -60,6 +61,7 @@ class GmailService:
             (self.LABEL_PHISHING, "#d93025"),  # Red
             (self.LABEL_SUSPICIOUS, "#f9ab00"),  # Orange
             (self.LABEL_SAFE, "#34a853"),  # Green
+            (self.LABEL_QUARANTINE, "#202124"),  # Dark
         ]
         
         # Get existing labels
@@ -270,6 +272,10 @@ class GmailService:
         """Remove a label from an email."""
         try:
             label_id = self._label_cache.get(label_name)
+            if not label_id:
+                # If it's a system label like INBOX, use the name directly
+                label_id = label_name
+            
             if label_id:
                 self.service.users().messages().modify(
                     userId='me',
@@ -278,8 +284,20 @@ class GmailService:
                 ).execute()
                 return True
         except Exception as e:
-            print(f"Error removing label: {e}")
+            print(f"Error removing label {label_name}: {e}")
         return False
+
+    def quarantine_email(self, message_id: str) -> bool:
+        """Quarantine email (add quarantine label, remove from INBOX)."""
+        try:
+            # Add quarantine label
+            self.apply_label(message_id, self.LABEL_QUARANTINE)
+            # Remove from INBOX
+            self.remove_label(message_id, 'INBOX')
+            return True
+        except Exception as e:
+            print(f"Error quarantining email: {e}")
+            return False
     
     def mark_as_safe(self, message_id: str) -> bool:
         """Mark email as safe (remove threat labels, add safe label)."""

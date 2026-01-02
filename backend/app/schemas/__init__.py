@@ -20,6 +20,8 @@ from app.schemas.schemas import (
     DetectionRuleResponse,
     PhishingExample,
     SecurityTip,
+    UrlScanRequest,
+    UrlScanResponse,
 )
 
 __all__ = [
@@ -43,4 +45,6 @@ __all__ = [
     "DetectionRuleResponse",
     "PhishingExample",
     "SecurityTip",
+    "UrlScanRequest",
+    "UrlScanResponse",
 ]

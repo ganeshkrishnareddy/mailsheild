@@ -22,7 +22,8 @@ function LandingPage() {
         setLoading(true);
         try {
             console.log('Calling login API...');
-            const response = await api.get('/api/auth/login');
+            // Add a timeout to prevent infinite hanging
+            const response = await api.get('/api/auth/login', { timeout: 5000 });
             console.log('Response:', response.data);
             if (response.data.authorization_url) {
                 window.location.href = response.data.authorization_url;
@@ -31,7 +32,8 @@ function LandingPage() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('Failed to initiate login: ' + (error.response?.data?.detail || error.message));
+            const errorMessage = error.response?.data?.detail || error.message || 'Unknown error occurred';
+            alert(`Login Failed: ${errorMessage}\n\nCheck console for details.`);
             setLoading(false);
         }
     };
@@ -88,6 +90,9 @@ function LandingPage() {
                             <a href="#how-it-works" className="text-slate-400 hover:text-white transition-colors hidden sm:block">
                                 How It Works
                             </a>
+                            <Link to="/about" className="text-slate-400 hover:text-white transition-colors hidden sm:block">
+                                Our Mission
+                            </Link>
                             <Link to="/developers" className="text-slate-400 hover:text-white transition-colors hidden sm:block">
                                 Developers
                             </Link>
@@ -130,10 +135,10 @@ function LandingPage() {
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mail className="w-5 h-5" />}
                             {loading ? 'Connecting...' : 'Connect Gmail'}
                         </button>
-                        <a href="#developers" className="btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2">
+                        <Link to="/developers" className="btn-secondary text-lg px-8 py-4 flex items-center justify-center gap-2">
                             <Eye className="w-5 h-5" />
                             About Developers
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Trust badges */}
@@ -383,12 +388,15 @@ function LandingPage() {
                             <Shield className="w-6 h-6 text-blue-500" />
                             <span className="text-lg font-bold text-white">MailShield</span>
                         </div>
-                        <div className="flex items-center gap-6 text-slate-400 text-sm">
-                            <Link to="/developers" className="hover:text-white transition-colors">Meet the Developers</Link>
+                        <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400 text-sm">
+                            <Link to="/about" className="hover:text-white transition-colors">Our Mission</Link>
+                            <Link to="/developers" className="hover:text-white transition-colors">Meet the Pioneers</Link>
+                            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         </div>
                         <div className="text-slate-500 text-sm text-center md:text-right">
                             © 2025 MailShield Project. <br />
-                            Built with ❤️ by LPU Students.
+                            Built with ❤️ by the <span className="text-white font-semibold">MailShield Pioneers</span>
                         </div>
                     </div>
                 </div>

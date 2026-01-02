@@ -13,67 +13,73 @@ import {
     Cpu,
     Briefcase,
     ExternalLink,
-    ArrowLeft
+    ArrowLeft,
+    Heart
 } from 'lucide-react';
 
 function Developers() {
     const developers = [
         {
             name: "P Ganesh Krishna Reddy",
-            role: "Lead Full Stack & Backend Developer",
+            role: "Security Engineer & Full Stack Developer",
             initials: "PG",
             color: "blue",
             imageBg: "bg-blue-600/20",
             textColor: "text-blue-500",
-            description: "Final Year B.Tech CSE Student at Lovely Professional University. A passionate Full Stack Developer who architected the entire MailShield platform, including the FastAPI backend, React frontend service integration, and scalable system design.",
-            skills: ["Full Stack Development", "FastAPI / Python", "React / Node.js", "System Architecture", "Cloud Deployment"],
+            description: "Final Year Computer Science (Cyber Security) student at LPU. A certified Security Engineer and Full Stack Developer with deep expertise in data protection, risk assessment, and secure system architecture. Recipient of the Reliance Foundation Scholarship.",
+            skills: ["CompTIA Security+ / CySA+ / PenTest+", "Web & API Security (OWASP)", "Data Privacy & Governance", "FastAPI / React / Node.js", "Linux Hardening (Red Hat Certified)"],
             links: {
                 portfolio: "https://pganeshkrishnareddy.netlify.app",
                 linkedin: "https://linkedin.com/in/pganeshkrishnareddy",
                 github: "https://github.com/ganeshkrishnareddy",
-                email: "pganeshkrishnareddy@gmail.com",
-                phone: "+91-8374622779"
+                email: "pganeshkrishnareddy@gmail.com"
             },
             projects: [
                 {
                     name: "MailShield",
-                    desc: "Privacy-first phishing detection platform with real-time analysis.",
-                    tech: "FastAPI, React, Tensorflow"
+                    desc: "Architected the backend and security detection logic for this platform.",
+                    tech: "FastAPI, OAuth 2.0, Python"
                 },
                 {
-                    name: "Delivery Management System",
-                    desc: "Comprehensive logistics platform with tracking and admin dashboard.",
-                    tech: "MERN Stack, Flutter, Firebase"
+                    name: "Security Risk Validation",
+                    desc: "Conducted structured assessments identifying data exposure and access flaws.",
+                    tech: "Burp Suite, OWASP ZAP, Nmap"
                 },
                 {
-                    name: "AI Code Assistant",
-                    desc: "Agentic coding tool built with LLM integration.",
-                    tech: "Python, LangChain, OpenAI"
+                    name: "Secure File Transfer",
+                    desc: "Built an encrypted solution emphasizing confidentiality and HMAC integrity.",
+                    tech: "AES-256, RSA, HMAC, Linux"
                 }
             ]
         },
         {
-            name: "K Vinodh Kumar Reddy",
-            role: "Security Research & Android Developer",
-            initials: "KV",
+            name: "Vinodh Kumar Reddy Kora",
+            role: "Security Researcher & Android Developer",
+            initials: "VK",
             color: "purple",
             imageBg: "bg-purple-600/20",
             textColor: "text-purple-500",
-            description: "Final Year B.Tech CSE Student at Lovely Professional University. Focused on cybersecurity and mobile development. Developed the core phishing detection algorithms, including homoglyph analysis and spam filters, and built the native Android application.",
-            skills: ["Android Development (Kotlin)", "Cybersecurity", "Phishing Detection Algorithms", "Spam Filtering Logic", "Mobile UI/UX"],
+            description: "B.Tech (Hons.) in Cyber Security and Blockchain student at LPU. A certified Cybersecurity Enthusiast with a focus on defensive security, digital forensics, and network defense. Expert in mobile security and threat analysis.",
+            skills: ["CompTIA Security+ / Network+ ce", "Digital Forensic Investigator (QHC)", "Blockchain & Defensive Security", "Android (Kotlin / Jetpack Compose)", "Incident Response & Forensics"],
             links: {
+                linkedin: "https://www.linkedin.com/in/vinodh-kumar-reddy-kora/",
                 email: "vinodhreddy@example.com"
             },
             projects: [
                 {
-                    name: "PhishGuard Android",
-                    desc: "Native mobile app for on-the-go email security scanning.",
-                    tech: "Kotlin, Jetpack Compose"
+                    name: "MailShield Android",
+                    desc: "Developed the native Android application and mobile threat analysis layer.",
+                    tech: "Kotlin, Jetpack Compose, Retrofit"
                 },
                 {
-                    name: "SpamFilter Algo",
-                    desc: "Advanced heuristic algorithm for detecting spam patterns.",
-                    tech: "Python, Scikit-learn"
+                    name: "Digital Forensics Analysis",
+                    desc: "Conducted deep-dive investigations into security incidents and data breaches.",
+                    tech: "Quick Heal Certified Forensics"
+                },
+                {
+                    name: "PhishGuard Logic",
+                    desc: "Implemented advanced heuristic algorithms for detecting malicious mail patterns.",
+                    tech: "Python, Scikit-learn, Android"
                 }
             ]
         }
@@ -191,11 +197,11 @@ function Developers() {
                         ))}
                     </div>
 
-                    {/* University Banner */}
+                    {/* Independence Banner */}
                     <div className="text-center fade-in">
                         <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-slate-800 border border-slate-700 text-slate-400">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                            Mentored by Expert Faculty at LPU
+                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                            Original Concept & Independent Implementation
                         </div>
                     </div>
 
@@ -205,8 +211,14 @@ function Developers() {
             {/* Footer */}
             <footer className="py-12 px-4 border-t border-slate-800 bg-slate-950/50">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="text-slate-500 text-sm">
-                        © 2025 MailShield.
+                    <div className="flex flex-wrap items-center justify-center gap-6 text-slate-400 text-sm">
+                        <Link to="/about" className="hover:text-white transition-colors">Our Mission</Link>
+                        <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                    </div>
+                    <div className="text-slate-500 text-sm text-center md:text-right">
+                        © 2025 MailShield Project. <br />
+                        Built with <Heart className="inline w-4 h-4 text-red-500 fill-red-500" /> by the <span className="text-white font-semibold">MailShield Pioneers</span>
                     </div>
                 </div>
             </footer>

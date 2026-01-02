@@ -10,6 +10,7 @@ import threading
 
 from app.services.gmail_service import GmailService
 from app.services.telegram_service import telegram_service, AlertMessage
+from app.services.reporting_service import reporting_service
 from app.models import User, ScanHistory
 from app.core.database import async_session_maker
 from app.core.security import decrypt_token
@@ -138,6 +139,23 @@ class AutoScanner:
                         user.emails_scanned += 1
                         if detection.risk_level == 'high':
                             user.phishing_detected += 1
+                            # Auto-Quarantine if enabled
+                            if user.quarantine_enabled:
+                                try:
+                                    gmail.quarantine_email(email.message_id)
+                                except Exception as e:
+                                    print(f"Failed to quarantine email {email.message_id}: {e}")
+                            
+                            # Auto-Report if enabled
+                            if user.auto_reporting_enabled:
+                                try:
+                                    await reporting_service.report_threat({
+                                        'sender': email.sender,
+                                        'subject': email.subject,
+                                        'reasons': detection.detection_reasons
+                                    }, user.email)
+                                except Exception as e:
+                                    print(f"Failed to auto-report threat: {e}")
                         elif detection.risk_level in ['medium', 'low']:
                             user.suspicious_detected += 1
                 

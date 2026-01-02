@@ -135,9 +135,32 @@ function Layout({ children }) {
                 </header>
 
                 {/* Page content */}
-                <main className="flex-1 p-4 lg:p-6">
+                <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6">
                     {children}
                 </main>
+
+                {/* Mobile Bottom Navigation */}
+                <div className="lg:hidden fixed bottom-6 left-6 right-6 z-50">
+                    <div className="glass shadow-2xl rounded-3xl border border-white/10 p-2 flex items-center justify-around translate-y-0 active:scale-[0.98] transition-all">
+                        {navigation.map((item) => {
+                            const Icon = item.icon;
+                            const active = isActive(item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    to={item.href}
+                                    className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-300 ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'text-slate-400 hover:text-white'
+                                        }`}
+                                >
+                                    <Icon className={`w-5 h-5 ${active ? 'animate-float' : ''}`} />
+                                    {active && (
+                                        <span className="absolute -bottom-1 w-1 h-1 bg-white rounded-full"></span>
+                                    )}
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );

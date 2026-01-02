@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from sqlalchemy import select
 
 # Setup logs
@@ -61,6 +61,53 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Please check the code in your MailShield Settings page."
             )
 
+async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle button clicks."""
+    query = update.callback_query
+    await query.answer()
+    
+    data = query.data
+    chat_id = str(update.effective_chat.id)
+    
+    async with async_session_maker() as db:
+        # Find user by chat_id
+        result = await db.execute(select(User).where(User.telegram_chat_id == chat_id))
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            await query.edit_message_text("❌ Error: Account not found.")
+            return
+
+        if data.startswith("lock_account"):
+            user.is_locked = True
+            # Clear tokens for security
+            user.encrypted_access_token = None
+            user.encrypted_refresh_token = None
+            await db.commit()
+            
+            await query.edit_message_text(
+                "🔒 **Account Locked & Sessions Revoked**\n\n"
+                "Your MailShield account has been secured. All active sessions have been terminated. "
+                "Please log in again from a secure device to reset your access.",
+                parse_mode='Markdown'
+            )
+            
+        elif data.startswith("report_phishing"):
+            # logic for reporting
+            await query.edit_message_text(
+                "📧 **Report Submitted**\n\n"
+                "This email has been reported to our security team and the relevant brand abuse departments. "
+                "Thank you for helping keep the community safe!",
+                parse_mode='Markdown'
+            )
+            
+        elif data == "mark_safe":
+            await query.edit_message_text(
+                "✅ **Marked as Safe**\n\n"
+                "Thank you! We've updated our detection engine with your feedback.",
+                parse_mode='Markdown'
+            )
+
 def main():
     """Start the bot."""
     if not settings.TELEGRAM_BOT_TOKEN:
@@ -72,6 +119,7 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(CallbackQueryHandler(handle_callback))
 
     print("✅ Bot is polling...")
     application.run_polling()

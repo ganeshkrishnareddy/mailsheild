@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 250px;
+            padding: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #1a73e8;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            background: #e6f4ea;
+            color: #137333;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .feature {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #1a73e8;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #1765cc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        🛡️ <h2>MailShield</h2>
+    </div>
+    <div class="status">
+        ✅ Protection Active
+    </div>
+    <div class="feature">
+        <span>URL Scanning</span>
+        <span>On</span>
+    </div>
+    <div class="feature">
+        <span>Gmail Highlighting</span>
+        <span>On</span>
+    </div>
+    <div id="recent-scans" style="margin-top: 15px;">
+        <h3 style="font-size: 14px; margin-bottom: 5px;">Recent URL Scans</h3>
+        <div id="scan-list" style="font-size: 12px; color: #5f6368;">
+            Loading latest scans...
+        </div>
+    </div>
+    <hr>
+    <button class="btn" id="open-dashboard">Open Dashboard</button>
+    <script src="popup.js"></script>
+</body>
+
+</html>

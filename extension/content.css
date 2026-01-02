@@ -1,0 +1,23 @@
+/* MailShield Alert Styles */
+.mailshield-alert {
+    font-weight: bold;
+    font-size: 1.2em;
+    cursor: help;
+    animation: mailshield-pulse 1s infinite alternate;
+}
+
+@keyframes mailshield-pulse {
+    from {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+[title^="⚠️ MailShield"] {
+    cursor: crosshair !important;
+}

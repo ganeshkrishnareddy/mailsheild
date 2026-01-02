@@ -37,8 +37,13 @@ class User(Base):
     
     # User preferences
     auto_labeling_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    quarantine_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    auto_reporting_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     notification_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     notification_level: Mapped[str] = mapped_column(String(20), default="high")  # high, medium, all
+    
+    # Security State
+    is_locked: Mapped[bool] = mapped_column(Boolean, default=False)
     
     # Stats (anonymized counts only)
     emails_scanned: Mapped[int] = mapped_column(Integer, default=0)
@@ -89,6 +94,23 @@ class ScanHistory(Base):
     user_reported_phishing: Mapped[bool] = mapped_column(Boolean, default=False)
     
     # Timestamps
+    scanned_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class UrlScanHistory(Base):
+    """Tracks individual URL scans from the browser extension."""
+    __tablename__ = "url_scan_history"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    
+    url: Mapped[str] = mapped_column(Text)
+    domain: Mapped[str] = mapped_column(String(255))
+    
+    risk_score: Mapped[int] = mapped_column(Integer)
+    risk_level: Mapped[str] = mapped_column(String(20))
+    detection_reasons: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    
     scanned_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

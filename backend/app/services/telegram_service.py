@@ -7,7 +7,7 @@ from typing import Optional, Dict, Any
 from dataclasses import dataclass
 import secrets
 
-from telegram import Bot
+from telegram import Bot, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import TelegramError
 
 from app.core.config import settings
@@ -96,7 +96,23 @@ class TelegramService:
 🛡️ <i>Protected by MailShield</i>
             """.strip()
             
-            await self.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
+            # Add Lockdown and Report buttons
+            keyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("🔒 Lock My Account", callback_data=f"lock_account:{alert.risk_score}"),
+                    InlineKeyboardButton("📧 Report", callback_data=f"report_phishing:{alert.risk_score}")
+                ],
+                [
+                    InlineKeyboardButton("✅ It's Safe", callback_data="mark_safe")
+                ]
+            ])
+            
+            await self.bot.send_message(
+                chat_id=chat_id, 
+                text=message, 
+                parse_mode='HTML',
+                reply_markup=keyboard
+            )
             return True
         except Exception as e:
             print(f"Telegram error: {e}")
