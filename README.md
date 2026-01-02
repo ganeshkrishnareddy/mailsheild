@@ -7,7 +7,11 @@ Deployed and maintained by **P Ganesh Krishna Reddy**.
 </p>
 
 [![MailShield](https://img.shields.io/badge/MailShield-v1.1.0-blue?style=for-the-badge&logo=android)](https://img.shields.io/badge/MailShield-v1.1.0-blue)
+[![Live Demo](https://img.shields.io/badge/Live-mailsheild.netlify.app-blue?style=for-the-badge&logo=netlify)](https://mailsheild.netlify.app)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](https://img.shields.io/badge/License-MIT-green)
+
+> [!NOTE]
+> **Standalone Demo Active**: The live web dashboard includes an internal simulation engine to demonstrate AI analysis features without requiring the FastAPI backend or mobile app connectivity.
 
 A multi-platform security ecosystem designed to protect users from phishing attacks using AI-powered analysis and real-time alerts.
 
