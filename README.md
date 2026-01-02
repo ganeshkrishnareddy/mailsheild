@@ -1,5 +1,7 @@
 # 🛡️ MailShield - Phishing Awareness Platform
 
+Deployed and maintained by **P Ganesh Krishna Reddy**.
+
 <p align="center">
   <img src="logo.png" width="400" alt="MailShield Logo">
 </p>
