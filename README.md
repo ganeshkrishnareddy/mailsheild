@@ -74,5 +74,7 @@ Our engine analyzes:
 ## 🤝 Contributing
 Built with ❤️ for a safer digital world. PRs are welcome!
 
-**Maintainer**: Ganesh Krishna Reddy
-**Contact**: ganeshkrishnareddy6@gmail.com
+**Maintainer**: P Ganesh Krishna Reddy
+**Contact**: pganeshkrishnareddy@gmail.com
+**Portfolio**: [pganeshreddy.netlify.app](https://pganeshreddy.netlify.app/)
+**LinkedIn**: [linkedin.com/in/pganeshkrishnareddy](https://linkedin.com/in/pganeshkrishnareddy)
