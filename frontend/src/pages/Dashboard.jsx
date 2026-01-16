@@ -187,10 +187,10 @@ function Dashboard() {
                         <SettingsIcon className="w-5 h-5" />
                     </Link>
                     <div className="hidden lg:flex items-center gap-3 bg-slate-800/50 p-1.5 rounded-2xl border border-white/5">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                            {user?.name?.charAt(0) || 'U'}
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-[10px] font-bold">
+                            {user?.name ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                         </div>
-                        <span className="text-sm font-medium mr-2">{user?.name?.split(' ')[0]}</span>
+                        <span className="text-sm font-medium mr-2 max-w-[180px] truncate">{user?.name}</span>
                     </div>
                 </div>
             </div>

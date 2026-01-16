@@ -4,56 +4,165 @@
 <head>
     <meta charset="utf-8">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            width: 250px;
-            padding: 15px;
+            width: 280px;
+            padding: 16px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            margin: 0;
         }
 
         .header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
         .header h2 {
             margin: 0;
             font-size: 18px;
-            color: #1a73e8;
+            color: #3b82f6;
+        }
+
+        .trust-score-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .trust-score-header {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .trust-score-domain {
+            font-size: 14px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .trust-score-value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score-badge {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .score-badge.safe { color: #22c55e; }
+        .score-badge.low { color: #eab308; }
+        .score-badge.medium { color: #f97316; }
+        .score-badge.high { color: #ef4444; }
+
+        .score-label {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .score-label.safe { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .score-label.low { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .score-label.medium { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .score-label.high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        .loading {
+            color: #64748b;
+            font-size: 12px;
         }
 
         .status {
-            padding: 10px;
+            padding: 8px 12px;
             border-radius: 8px;
-            background: #e6f4ea;
-            color: #137333;
-            font-size: 14px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            font-size: 12px;
             font-weight: 500;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .feature {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 13px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .feature span:last-child {
+            color: #22c55e;
+            font-weight: 500;
+        }
+
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin: 16px 0 8px 0;
+        }
+
+        #scan-list {
+            font-size: 11px;
+            color: #94a3b8;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .scan-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .scan-url {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
         }
 
         .btn {
             width: 100%;
-            padding: 10px;
-            background: #1a73e8;
+            padding: 12px;
+            background: #3b82f6;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             color: white;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.2s;
         }
 
         .btn:hover {
-            background: #1765cc;
+            background: #2563eb;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 16px 0;
         }
     </style>
 </head>
@@ -62,9 +171,19 @@
     <div class="header">
         🛡️ <h2>MailShield</h2>
     </div>
+
+    <!-- Trust Score Card -->
+    <div class="trust-score-card">
+        <div class="trust-score-header">Current Site Trust Score</div>
+        <div id="trust-score-content">
+            <div class="loading">Analyzing...</div>
+        </div>
+    </div>
+
     <div class="status">
         ✅ Protection Active
     </div>
+
     <div class="feature">
         <span>URL Scanning</span>
         <span>On</span>
@@ -73,12 +192,12 @@
         <span>Gmail Highlighting</span>
         <span>On</span>
     </div>
-    <div id="recent-scans" style="margin-top: 15px;">
-        <h3 style="font-size: 14px; margin-bottom: 5px;">Recent URL Scans</h3>
-        <div id="scan-list" style="font-size: 12px; color: #5f6368;">
-            Loading latest scans...
-        </div>
+
+    <div class="section-title">Recent URL Scans</div>
+    <div id="scan-list">
+        Loading...
     </div>
+
     <hr>
     <button class="btn" id="open-dashboard">Open Dashboard</button>
     <script src="popup.js"></script>

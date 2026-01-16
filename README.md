@@ -76,5 +76,5 @@ Built with ❤️ for a safer digital world. PRs are welcome!
 
 **Maintainer**: P Ganesh Krishna Reddy
 **Contact**: pganeshkrishnareddy@gmail.com
-**Portfolio**: [pganeshreddy.netlify.app](https://pganeshreddy.netlify.app/)
+**Portfolio**: [pganeshkrishnareddy.vercel.app](https://pganeshkrishnareddy.vercel.app/)
 **LinkedIn**: [linkedin.com/in/pganeshkrishnareddy](https://linkedin.com/in/pganeshkrishnareddy)

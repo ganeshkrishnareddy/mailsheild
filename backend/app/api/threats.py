@@ -18,37 +18,43 @@ async def scan_url(
     request: Request,
     db: AsyncSession = Depends(get_db)
 ):
-    """Scan a URL for phishing threats."""
+    """Scan a URL for phishing threats (optimized for speed)."""
     user = None
     try:
         user = await get_user_from_token(request, db)
     except:
-        # Allow anonymous scans for the extension if not logged in? 
-        # For now, let's just make it anonymous-friendly but trace if possible
         pass
     
     url = scan_request.url
-    extracted = tldextract.extract(url)
-    domain = f"{extracted.domain}.{extracted.suffix}"
     
-    # 1. Homoglyph detection
-    is_homo, homo_reason = detection_engine.detect_homoglyph_attack(domain)
+    # Fast domain extraction without tldextract network calls
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        if domain.startswith('www.'):
+            domain = domain[4:]
+    except:
+        domain = url
     
-    # 2. Typosquatting
-    is_typo, typo_reason = detection_engine.check_typosquatting(domain)
-    
-    # 3. IDN
-    is_idn, idn_reason = detection_engine.detect_idn_homograph(domain)
-    
+    # Quick checks only
     reasons = []
     score = 0
     
+    # 1. Homoglyph detection (fast, no network)
+    is_homo, homo_reason = detection_engine.detect_homoglyph_attack(domain)
     if is_homo:
         reasons.append(homo_reason)
         score += 35
+    
+    # 2. Typosquatting (fast, no network)
+    is_typo, typo_reason = detection_engine.check_typosquatting(domain)
     if is_typo:
         reasons.append(typo_reason)
         score += 25
+    
+    # 3. IDN (fast, no network)
+    is_idn, idn_reason = detection_engine.detect_idn_homograph(domain)
     if is_idn:
         reasons.append(idn_reason)
         score += 30
@@ -64,17 +70,20 @@ async def scan_url(
     elif score >= 10:
         risk_level = "low"
         
-    # Store in history
-    scan_record = UrlScanHistory(
-        user_id=user.id if user else None,
-        url=url,
-        domain=domain,
-        risk_score=score,
-        risk_level=risk_level,
-        detection_reasons={'types': reasons}
-    )
-    db.add(scan_record)
-    await db.commit()
+    # Store in history (async, don't block)
+    try:
+        scan_record = UrlScanHistory(
+            user_id=user.id if user else None,
+            url=url,
+            domain=domain,
+            risk_score=score,
+            risk_level=risk_level,
+            detection_reasons={'types': reasons}
+        )
+        db.add(scan_record)
+        await db.commit()
+    except:
+        pass  # Don't fail if DB write fails
     
     return UrlScanResponse(
         url=url,
@@ -90,7 +99,11 @@ async def get_recent_urls(
     db: AsyncSession = Depends(get_db)
 ):
     """Get recent URL scans for the dashboard."""
-    user = await get_user_from_token(request, db)
+    try:
+        user = await get_user_from_token(request, db)
+    except:
+        # No auth - return empty list for extension
+        return []
     
     from sqlalchemy import select
     result = await db.execute(

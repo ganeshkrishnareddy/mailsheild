@@ -54,15 +54,15 @@ function Settings() {
     );
 
     return (
-        <div className="space-y-8 fade-in max-w-4xl">
+        <div className="space-y-10 fade-in w-full max-w-[1400px]">
             <div>
                 <h1 className="text-2xl lg:text-4xl font-bold text-white tracking-tight">Settings</h1>
                 <p className="text-slate-400 text-sm mt-1">Manage your protection and account preferences</p>
             </div>
 
-            <div className="grid lg:grid-cols-5 gap-8">
+            <div className="grid lg:grid-cols-2 xl:grid-cols-12 gap-8 lg:gap-10">
                 {/* Security Settings Section */}
-                <div className="lg:col-span-3 space-y-6">
+                <div className="xl:col-span-8 space-y-8">
                     <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Security & Automation</h2>
 
                     {/* Auto Labeling */}
@@ -169,7 +169,7 @@ function Settings() {
                 </div>
 
                 {/* Account & Metadata Sidebar */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="xl:col-span-4 space-y-8">
                     <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Data & Privacy</h2>
 
                     <div className="glass-card p-6 lg:p-8 space-y-6">
